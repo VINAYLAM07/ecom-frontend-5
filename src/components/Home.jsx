@@ -106,7 +106,10 @@ const Home = ({ selectedCategory }) => {
                 <button
                   type="button"
                   className="btn-hover color-9 product-card-button"
-                  onClick={() => addToCart(product)}
+                  onClick={() => {
+                    addToCart(product);
+                    alert("Product added to cart");
+                  }}
                   disabled={!productAvailable}
                 >
                   {productAvailable ? "Add to Cart" : "Out of Stock"}
