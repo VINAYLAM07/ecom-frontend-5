@@ -1,0 +1,136 @@
+.order-success-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  margin-top: 80px;
+}
+
+.success-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  padding: 60px 40px;
+  max-width: 600px;
+  text-align: center;
+  animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.success-icon {
+  font-size: 80px;
+  color: #28a745 !important;
+  margin-bottom: 20px;
+  animation: scaleIn 0.5s ease-out 0.2s both;
+}
+
+.success-icon i {
+  color: #28a745 !important;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.success-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.success-message {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+.success-details {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 30px;
+  margin-bottom: 30px;
+  text-align: left;
+}
+
+.success-details p {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 15px;
+  line-height: 1.6;
+}
+
+.success-details p i {
+  font-size: 1.5rem;
+  color: #28a745 !important;
+  margin-right: 15px;
+  min-width: 30px;
+  display: inline-block;
+}
+
+.success-details p:last-child {
+  margin-bottom: 0;
+}
+
+.continue-btn {
+  padding: 12px 40px;
+  font-size: 1.1rem;
+  background-color: #667eea;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.continue-btn:hover {
+  background-color: #764ba2;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 600px) {
+  .success-card {
+    padding: 40px 20px;
+  }
+
+  .success-title {
+    font-size: 1.8rem;
+  }
+
+  .success-icon {
+    font-size: 60px;
+  }
+
+  .success-details {
+    padding: 20px;
+  }
+
+  .success-details p {
+    font-size: 0.9rem;
+  }
+
+  .success-details p i {
+    font-size: 1.2rem;
+  }
+}

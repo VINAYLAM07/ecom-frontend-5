@@ -256,8 +256,10 @@ import AppContext from "../Context/Context";
 import axios from "axios";
 import CheckoutPopup from "./CheckoutPopup";
 import { Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
+  const navigate = useNavigate();
   const { cart, removeFromCart, clearCart } = useContext(AppContext);
   const [cartItems, setCartItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
@@ -348,8 +350,25 @@ const Cart = () => {
     setCartItems(newCartItems);
   };
 
-  const handleCheckout = async () => {
+  const handleCheckout = async (customerName, customerEmail) => {
     try {
+      // Transform cart items to match OrderItemRequest format
+      const orderItems = cartItems.map((item) => ({
+        productId: item.id,
+        quantity: item.quantity,
+        price: item.price,
+      }));
+
+      // Save order to database
+      const orderData = {
+        customerName: customerName,
+        email: customerEmail,
+        items: orderItems,
+      };
+
+      await axios.post("http://localhost:8080/api/orders/place", orderData);
+
+      // Update product stock
       for (const item of cartItems) {
         const { imageUrl, imageName, imageData, imageType, quantity, ...rest } =
           item;
@@ -386,8 +405,10 @@ const Cart = () => {
       clearCart();
       setCartItems([]);
       setShowModal(false);
+      navigate("/order-success");
     } catch (error) {
       console.log("error during checkout", error);
+      alert("Error placing order. Please try again.");
     }
   };
 

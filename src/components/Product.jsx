@@ -55,9 +55,32 @@ const Product = () => {
     navigate(`/product/update/${id}`);
   };
 
-  const handlAddToCart = () => {
-    addToCart(product);
-    alert("Product added to cart");
+  const handlAddToCart = async () => {
+    try {
+      await axios.put(
+        `http://localhost:8080/api/products/${product.id}/reduce-stock`,
+      );
+      addToCart(product);
+      setProduct((prevProduct) => {
+        if (!prevProduct) return prevProduct;
+        const updatedQuantity = Math.max(0, prevProduct.stockQuantity - 1);
+        return {
+          ...prevProduct,
+          stockQuantity: updatedQuantity,
+          productAvailable: updatedQuantity > 0,
+        };
+      });
+      alert("Product added to cart");
+      refreshData(); // important to reload stock for other pages
+    } catch (err) {
+      console.error(err);
+
+      if (err.response?.data) {
+        alert(err.response.data);
+      } else {
+        alert("Something went wrong");
+      }
+    }
   };
   if (!product) {
     return (
@@ -123,10 +146,12 @@ const Product = () => {
             </span>
             <button
               className={`cart-btn ${
-                !product.productAvailable ? "disabled-btn" : ""
+                !product.productAvailable || product.stockQuantity <= 0
+                  ? "disabled-btn"
+                  : ""
               }`}
               onClick={handlAddToCart}
-              disabled={!product.productAvailable}
+              disabled={!product.productAvailable || product.stockQuantity <= 0}
               style={{
                 padding: "1rem 2rem",
                 fontSize: "1rem",
@@ -138,7 +163,9 @@ const Product = () => {
                 marginBottom: "1rem",
               }}
             >
-              {product.productAvailable ? "Add to cart" : "Out of Stock"}
+              {product.productAvailable && product.stockQuantity > 0
+                ? "Add to cart"
+                : "Out of Stock"}
             </button>
             <h6 style={{ marginBottom: "1rem" }}>
               Stock Available :{" "}
