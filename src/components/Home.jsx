@@ -9,6 +9,35 @@ const Home = ({ selectedCategory }) => {
   const [products, setProducts] = useState([]);
   const [isDataFetched, setIsDataFetched] = useState(false);
 
+  const handleAddToCart = async (product) => {
+    try {
+      await axios.put(
+        `http://localhost:8080/api/products/${product.id}/reduce-stock`,
+      );
+      addToCart(product);
+      setProducts((prevProducts) =>
+        prevProducts.map((item) => {
+          if (item.id !== product.id) return item;
+          const updatedQuantity = Math.max(0, item.stockQuantity - 1);
+          return {
+            ...item,
+            stockQuantity: updatedQuantity,
+            productAvailable: updatedQuantity > 0,
+          };
+        }),
+      );
+      alert("Product added to cart");
+      refreshData();
+    } catch (err) {
+      console.error(err);
+      if (err.response?.data) {
+        alert(err.response.data);
+      } else {
+        alert("Something went wrong");
+      }
+    }
+  };
+
   useEffect(() => {
     if (!isDataFetched) {
       refreshData();
@@ -27,18 +56,22 @@ const Home = ({ selectedCategory }) => {
                 { responseType: "blob" },
               );
               const imageUrl = URL.createObjectURL(response.data);
-              return { ...product, imageUrl };
+              return { ...product, id: product.id, imageUrl };
             } catch (error) {
               console.error(
                 "Error fetching image for product ID:",
                 product.id,
                 error,
               );
-              return { ...product, imageUrl: "placeholder-image-url" };
+              return {
+                ...product,
+                id: product.id,
+                imageUrl: "placeholder-image-url",
+              };
             }
           }),
         );
-        setProducts(updatedProducts);
+        setProducts(updatedProducts.sort((a, b) => a.id - b.id));
       };
 
       fetchImagesAndUpdateProducts();
@@ -76,11 +109,19 @@ const Home = ({ selectedCategory }) => {
           </h2>
         ) : (
           filteredProducts.map((product) => {
-            const { id, brand, name, price, productAvailable, imageUrl } =
-              product;
+            const {
+              id,
+              brand,
+              name,
+              price,
+              productAvailable,
+              imageUrl,
+              stockQuantity,
+            } = product;
+            const isSoldOut = !productAvailable || stockQuantity <= 0;
             return (
               <div
-                className={`card product-card mb-3 ${productAvailable ? "" : "out-of-stock-card"}`}
+                className={`card product-card mb-3 ${isSoldOut ? "out-of-stock-card" : ""}`}
                 key={id}
               >
                 <Link to={`/product/${id}`} className="product-card-link">
@@ -106,13 +147,10 @@ const Home = ({ selectedCategory }) => {
                 <button
                   type="button"
                   className="btn-hover color-9 product-card-button"
-                  onClick={() => {
-                    addToCart(product);
-                    alert("Product added to cart");
-                  }}
-                  disabled={!productAvailable}
+                  onClick={() => handleAddToCart(product)}
+                  disabled={isSoldOut}
                 >
-                  {productAvailable ? "Add to Cart" : "Out of Stock"}
+                  {isSoldOut ? "Out of Stock" : "Add to Cart"}
                 </button>
               </div>
             );
